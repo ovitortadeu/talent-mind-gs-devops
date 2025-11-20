@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${patio.id == null} ? 'Novo Pátio' : 'Editar Pátio'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <div th:replace="~{layout :: header}"></div>
+
+    <main>
+        <h3 th:text="${patio.id == null} ? 'Cadastrar Novo Pátio' : 'Editar Pátio'"></h3>
+        <form th:action="@{/patios/save}" th:object="${patio}" method="post">
+            <input type="hidden" th:field="*{id}" />
+    
+            <div>
+                <label for="nome">Nome do Pátio:</label>
+                <input type="text" id="nome" th:field="*{nome}" />
+                <span style="color:red;" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+            </div>
+            
+            <div>
+                <label for="logradouro">Logradouro (Endereço):</label>
+                <select id="logradouro" th:field="*{logradouro.id}"> 
+                    <option value="">Selecione um logradouro</option>
+                    <option th:each="log : ${todosLogradouros}"
+                            th:value="${log.id}"
+                            th:text="${log.nomeLogradouro + ', ' + log.numeroLogradouro}">
+                    </option>
+                </select>
+                <span style="color:red;" th:if="${#fields.hasErrors('logradouro')}" th:errors="*{logradouro}"></span>
+            </div>
+            
+            <button type="submit">Salvar</button>
+            <a th:href="@{/patios}" style="margin-left: 10px;">Cancelar</a>
+        </form>
+    </main>
+
+    <div th:replace="~{layout :: footer}"></div>
+</body>
+</html>

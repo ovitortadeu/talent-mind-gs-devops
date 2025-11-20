@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${veiculo.id == null} ? 'Novo Veículo' : 'Editar Veículo'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <div th:replace="~{layout :: header}"></div>
+
+    <main>
+        <h3 th:text="${veiculo.id == null} ? 'Cadastrar Novo Veículo' : 'Editar Veículo'"></h3>
+        <form th:action="@{/veiculos/save}" th:object="${veiculo}" method="post">
+            <input type="hidden" th:field="*{id}" />
+    
+            <div>
+                <label for="placaNova">Placa (Mercosul):</label>
+                <input type="text" id="placaNova" th:field="*{placaNova}" />
+                <span style="color:red;" th:if="${#fields.hasErrors('placaNova')}" th:errors="*{placaNova}"></span>
+            </div>
+            
+            <div>
+                <label for="placaAntiga">Placa Antiga (Opcional):</label>
+                <input type="text" id="placaAntiga" th:field="*{placaAntiga}" />
+            </div>
+            
+            <div>
+                <label for="tipoVeiculo">Tipo do Veículo:</label>
+                <input type="text" id="tipoVeiculo" th:field="*{tipoVeiculo}" />
+                <span style="color:red;" th:if="${#fields.hasErrors('tipoVeiculo')}" th:errors="*{tipoVeiculo}"></span>
+            </div>
+            
+            <div>
+                <label for="patio">Pátio:</label>
+                <select id="patio" th:field="*{patio.id}"> <option value="">Selecione um pátio</option>
+                    <option th:each="p : ${todosPatios}"
+                            th:value="${p.id}"
+                            th:text="${p.nome}">
+                    </option>
+                </select>
+                <span style="color:red;" th:if="${#fields.hasErrors('patio')}" th:errors="*{patio}"></span>
+            </div>
+            
+            <button type="submit">Salvar</button>
+            <a th:href="@{/veiculos}" style="margin-left: 10px;">Cancelar</a>
+        </form>
+    </main>
+
+    <div th:replace="~{layout :: footer}"></div>
+</body>
+</html>

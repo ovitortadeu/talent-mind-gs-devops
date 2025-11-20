@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Endereços (Logradouros)</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <div th:replace="~{layout :: header}"></div>
+
+    <main>
+        <h3>Gerenciamento de Endereços (Logradouros)</h3>
+        
+        <div style="margin-bottom: 15px;">
+            <a th:href="@{/logradouros/new}" class="button-link add">Adicionar Novo Endereço</a>
+        </div>
+        
+        <div th:if="${message}" class="success-message" th:text="${message}"></div>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Endereço</th>
+                    <th>Número</th>
+                    <th>CEP</th>
+                    <th>Cidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${logradouros.isEmpty()}">
+                    <td colspan="6">Nenhum endereço encontrado.</td>
+                </tr>
+                <tr th:each="log : ${logradouros}">
+                    <td th:text="${log.id}">1</td>
+                    <td th:text="${log.nomeLogradouro}">Rua Augusta</td>
+                    <td th:text="${log.numeroLogradouro}">1250</td>
+                    <td th:text="${log.cep}">01304001</td>
+                    <td th:text="${log.cidade?.nomeCidade ?: 'Sem Cidade'}">São Paulo</td>
+                    <td>
+                        <a th:href="@{/logradouros/edit/{id}(id=${log.id})}">Editar</a>
+                        |
+                        <a th:href="@{/logradouros/delete/{id}(id=${log.id})}">Excluir</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+   </main>
+
+    <div th:replace="~{layout :: footer}"></div>
+</body>
+</html>

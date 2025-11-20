@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Pátios</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <div th:replace="~{layout :: header}"></div>
+
+    <main>
+        <h3>Gerenciamento de Pátios</h3>
+        
+        <div style="margin-bottom: 15px;">
+            <a th:href="@{/patios/new}" class="button-link add">Adicionar Novo Pátio</a>
+        </div>
+        
+        <div th:if="${message}" class="success-message" th:text="${message}"></div>
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome do Pátio</th>
+                    <th>Endereço (Logradouro)</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${patios.isEmpty()}">
+                    <td colspan="4">Nenhum pátio encontrado.</td>
+                </tr>
+                <tr th:each="patio : ${patios}">
+                    <td th:text="${patio.id}">1</td>
+                    <td th:text="${patio.nome}">Pátio Central</td>
+                    <td th:text="${patio.logradouro?.nomeLogradouro ?: 'Sem Logradouro'}">Rua Augusta</td>
+                    <td>
+                        <a th:href="@{/patios/edit/{id}(id=${patio.id})}">Editar</a>
+                        |
+                        <a th:href="@{/patios/delete/{id}(id=${patio.id})}">Excluir</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+   </main>
+
+    <div th:replace="~{layout :: footer}"></div>
+</body>
+</html>
