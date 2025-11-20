@@ -1,109 +1,117 @@
-# Challenge Java Mottu - Aplicação Final (Sprint 4)
+# 💻 TalentMind - O Futuro do Trabalho (Global Solution Java Advanced)
 
-## 📋 Visão Geral do Projeto
+🌟 ## Visão Geral do Projeto
 
-Este projeto é a entrega final da disciplina de Java Advanced para o Challenge Mottu. A solução consiste em um sistema duplo:
+O **TalentMind** é uma plataforma inovadora desenvolvida para a Global Solution 2025 (Java Advanced). O projeto endereça o tema "O Futuro do Trabalho" ao conectar vagas, competências e cursos de requalificação (reskilling). A solução é construída com Spring Boot 3 (Java 21), adotando uma arquitetura com APIs REST (HATEOAS), WebApp (Thymeleaf) e forte ênfase em arquiteturas modernas.
 
-1.  Uma **API RESTful** robusta e segura (JWT), documentada com Swagger, pronta para ser consumida por aplicações mobile e outras integrações.
-2.  Uma **Aplicação Web (Backoffice)** construída com Thymeleaf e Spring Security, permitindo o gerenciamento administrativo do sistema.
+🎯 ## Objetivos Chave
 
-O modelo de dados foi refatorado (conforme feedback da S3) para focar no gerenciamento de **Pátios** de veículos, alinhando-se de forma mais precisa às regras de negócio da Mottu.
-
----
-
-## 👨‍💻 Aluno(s)
-
-* VITOR TADEU SOARES DE SOUSA - RM559105 - 2TDSPH
-* GIOVANNI DE SOUZA LIMA - RM5566536 - 2TDSPH
-* Diego bassalo          - rm558710 - 2TDSPG
----
-
-## ✨ Principais Funcionalidades
-
-### Aplicação Web (Backoffice com Thymeleaf)
-
-* **Autenticação Segura:** Sistema de login e logout via formulário (Spring Security).
-* **Controle de Acesso por Papel:**
-    * **ADMIN:** Acesso total ao CRUD de veículos e ao Dashboard.
-    * **USER:** Acesso restrito (tratado com página de "Acesso Negado").
-* **Gerenciamento de Veículos:** CRUD completo de veículos, agora corretamente associados a **Pátios**.
-* **Dashboard de Indicadores:** Página administrativa que exibe o total de usuários e veículos cadastrados.
-* **Tratamento de Erros Amigável:** Implementação de uma página de erro 403 (Acesso Negado) personalizada, tratando o feedback da S3.
-* **Layout Padronizado (DRY):** Uso de fragmentos Thymeleaf para cabeçalho e rodapé, evitando repetição de código.
-
-### API REST (Integração)
-
-* **Segurança via JWT:** Todos os endpoints em `/api/**` são protegidos por JSON Web Tokens.
-* **Documentação Interativa:** API documentada com Swagger (SpringDoc).
-* **Endpoints de Gerenciamento:** CRUD completo para `Usuários` e `Veículos`.
-* **Endpoints de Negócio (S4):** A API expõe lógica de negócio, como o endpoint `/api/veiculos/usuario/{usuarioId}` que lista todos os veículos que um usuário já *alugou* (via tabela `Locacao`).
-
-### Integração com Banco de Dados (Oracle)
-
-* **Versionamento de Schema:** O banco de dados é 100% gerenciado pelo Flyway, com 6 migrações que constroem o schema, inserem dados e aplicam as refatorações de domínio.
-* **Integração com Stored Procedures (S4):** A aplicação Java chama Stored Procedures Oracle para lógicas de negócio complexas, como demonstrado no `RelatorioService` (requisito da S4 de Banco de Dados).
+-   **IA Generativa**: Geração de planos de estudos personalizados, utilizando Spring AI e o modelo Llama 3.
+-   **Mensageria Assíncrona**: Utilização de RabbitMQ para processamento em background do cálculo de compatibilidade de novas vagas.
+-   **Segurança Robusta**: Implementação de Spring Security com autenticação Web (Form Login) e APIs stateless com JWT.
+-   **Internacionalização**: Suporte a múltiplos idiomas (Português/Inglês).
 
 ---
 
-## 🛠️ Principais Tecnologias Utilizadas
+🛠️ ## Pré-Requisitos
 
-* **Linguagem:** Java 21
-* **Framework:** Spring Boot 3.2.5
-    * Spring Web
-    * Spring Data JPA
-    * Spring Security
-    * Spring Validation
-* **Frontend (Backoffice):** Thymeleaf
-* **Banco de Dados:**
-    * Oracle
-    * Flyway (Versionamento de Schema)
-* **Mapeamento DTO:** MapStruct
-* **Documentação da API:** SpringDoc OpenAPI (Swagger)
-* **Autenticação:** Formulário (Web) e JSON Web Tokens (JWT para a API)
+Para rodar o projeto localmente, é necessário ter as seguintes ferramentas instaladas:
+
+-   Java Development Kit (JDK) 21
+-   Apache Maven 3.9.x (para construção do projeto)
+-   Docker (para inicializar os serviços de mensageria e IA)
+
+### 1. Instalação do Docker
+
+Acesse o site oficial do [Docker](https://www.docker.com/) e instale o Docker Desktop (para Windows/Mac) ou o Docker Engine (para Linux).
+
+### 2. Configuração do Banco de Dados Oracle
+
+As configurações de conexão para o banco de dados Oracle da FIAP são definidas em `src/main/resources/application.properties`. Certifique-se de atualizar com suas credenciais:
+
+```properties
+spring.datasource.url=jdbc:oracle:thin:@//oracle.fiap.com.br:1521/ORCL
+spring.datasource.username=seu_rm
+spring.datasource.password=sua_senha
+```
+
+### 3. Configuração da IA Generativa
+
+Este projeto utiliza a API do Groq para o modelo `llama-3.1-8b-instant`. Obtenha sua chave de API e insira-a no `application.properties`:
+
+```properties
+spring.ai.openai.api-key=gsk_SUA_CHAVE_AQUI
+```
 
 ---
 
-## 💻 Instruções para Execução Local
+🚀 ## Como Executar o Projeto
 
-### Pré-requisitos
+### 1. Inicialização das Dependências Críticas (Docker)
 
-* JDK 21 ou superior.
-* Apache Maven 3.6.+.
-* Acesso a um schema Oracle.
+O RabbitMQ e o banco de dados Oracle (via Flyway) são críticos. A execução do RabbitMQ via Docker é obrigatória para o funcionamento da mensageria assíncrona.
 
-### Passos para Executar
+**a) Inicializar RabbitMQ (Mensageria Assíncrona):**
 
-1.  **Clone o Repositório:**
-    ```bash
-    git clone [https://github.com/ovitortadeu/challenge-java-springboot](https://github.com/ovitortadeu/challenge-java-springboot)
-    cd challenge-java-springboot/challenge java/demo
+Este comando inicializa o servidor RabbitMQ em modo daemon na porta padrão e com o painel de gerenciamento exposto:
+
+```bash
+docker run -d --hostname rabbitmq --name rabbitmq-server -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+*(O Spring AMQP usará a porta `5672` e o console de administração estará em http://localhost:15672)*
+
+### 2. Compilação e Execução do Spring Boot
+
+Execute o projeto TalentMind via Maven Wrapper:
+
+```bash
+./mvnw spring-boot:run
+```
+
+**Migração de Banco de Dados**: O Flyway (dependência Maven) rodará automaticamente os scripts SQL (`V1` a `V4`)), criando todas as tabelas, triggers de auditoria, pacotes PL/SQL e dados de seed iniciais.
+
+---
+
+🔑 ## Acessos e Endpoints
+
+### 1. Acesso Web (Thymeleaf MVC)
+
+O Dashboard e a interface de administração estão disponíveis em: `http://localhost:8080/dashboard`.
+
+**Login de Administrador:**
+-   **E-mail**: `admin@talentmind.com`
+-   **Senha**: `password` (Senha BCrypt armazenada no script V4)
+
+### 2. API REST (Swagger UI)
+
+A documentação da API para testes (HATEOAS, Paginação, CRUD) está em: `http://localhost:8080/swagger-ui.html`.
+
+#### Endpoints Principais
+
+| Endpoint                               | Verbo | Descrição                                                              |
+| -------------------------------------- | ----- | ---------------------------------------------------------------------- |
+| `/api/auth/login`                      | POST  | Gera o token JWT para autenticação.                                    |
+| `/api/ia/plano-de-estudos/{vagaId}`      | GET   | Aciona a IA para gerar plano de estudos para a vaga especificada.      |
+| `/api/usuarios`                        | CRUD  | Gerenciamento de Usuários (com Paginação e HATEOAS).                   |
+| `/api/vagas`                           | CRUD  | Gerenciamento de Vagas (com Mensageria assíncrona ao criar/atualizar). |
+| `/api/competencias`                    | CRUD  | Gerenciamento de Competências.                                         |
+| `/api/cursos`                          | CRUD  | Gerenciamento de Cursos de Requalificação.                             |
+
+#### Autenticação JWT (Fluxo)
+
+1.  **Obter Token**: Faça um `POST` para `/api/auth/login` com as credenciais.
+2.  **Usar Token**: Envie o token JWT retornado no cabeçalho `Authorization` para acessar qualquer endpoint REST `api/**`:
+    ```
+    Authorization: Bearer <SEU_TOKEN>
     ```
 
-2.  **Configure o Banco de Dados:**
-    * Abra o arquivo `src/main/resources/application.properties`.
-    * Altere as propriedades `spring.datasource.username`  e `spring.datasource.password` para as credenciais do Oracle.
-
-3.  **Execute a Aplicação:**
-    * O Flyway criará e populará o banco de dados automaticamente na primeira inicialização.
-    ```bash
-    mvn spring-boot:run
-    ```
-
 ---
 
-## 🔑 Credenciais de Acesso (Web)
+📢 ## Fluxo de Mensageria Assíncrona
 
-A aplicação é populada com usuários de exemplo pelo Flyway.
+A criação de uma nova **Vaga** (via API ou Web App) aciona o seguinte fluxo assíncrono (RabbitMQ):
 
-* **Acesso Web:** [http://localhost:8080/](http://localhost:8080/)
-* **Acesso API (Swagger):** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-
-#### Perfil Administrador
-* **Usuário:** `admin`
-* **Senha:** `admin123`
-* **Permissões:** Acesso total ao CRUD de veículos e ao Dashboard.
-
-#### Perfil Usuário Comum
-* **Usuário:** `user`
-* **Senha:** `user123`
-* **Permissões:** Acesso restrito. Será redirecionado para a página "Acesso Negado" ao tentar acessar rotas de admin.
+1.  O `VagaService` persiste a nova vaga no DB.
+2.  O `VagaService` publica o `ID_VAGA` na `DirectExchange` com a chave `rk.vaga-nova`.
+3.  O `CompatibilidadeService` atua como listener na fila `q.talentmind.vaga-nova`.
+4.  O listener realiza o cálculo de compatibilidade entre a nova vaga e todos os usuários cadastrados em background, simulando um processamento pesado.
