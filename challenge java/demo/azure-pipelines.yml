@@ -5,15 +5,17 @@ resources:
   - repo: self
 
 variables:
-  # AJUSTE ESTAS VARIÁVEIS APÓS RODAR O SCRIPT DE INFRA
-  azureSubscriptionConnection: 'AzureConnection' # Nome da Service Connection no Azure DevOps
-  resourceGroupName: 'rg-talentmind-gs'
-  acrName: 'acrtalentmindgsXXXX' # Substitua pelo nome gerado no script
+  # CONFIGURAÇÃO DE INFRAESTRUTURA 
+  azureSubscriptionConnection: 'AzureConnection'
+  resourceGroupName: 'rg-talentmind-gs'      
+  acrName: 'acrtalentmindgsvitor'              
+  
+  # Configuração da Aplicação
   imageName: 'talentmind-java'
   containerName: 'app-talentmind-instance'
   
-  # Configuração da Imagem
-  dockerRegistryServiceConnection: 'AcrConnection' # Nome da conexão com o Docker Registry no ADO
+  # Configuração da Imagem e Docker
+  dockerRegistryServiceConnection: 'AcrConnection'
   tag: '$(Build.BuildId)'
 
 stages:
@@ -25,14 +27,12 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps:
-          # 1. Configurar Java 21
           - task: JavaToolInstaller@0
             inputs:
               versionSpec: '21'
               jdkArchitectureOption: 'x64'
               jdkSourceOption: 'PreInstalled'
 
-          # 2. Build e Testes Unitários (JUnit)
           - task: Maven@4
             displayName: 'Maven Build & Test'
             inputs:
@@ -43,7 +43,6 @@ stages:
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.21'
 
-          # 3. Publicar Artefato (JAR) - Opcional em Container, mas boa prática
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(system.defaultworkingdirectory)'
@@ -99,6 +98,8 @@ stages:
                   --image $(acrName).azurecr.io/$(imageName):$(tag) \
                   --dns-name-label $(containerName)-$RANDOM \
                   --ports 8080 \
+                  --cpu 1 \
+                  --memory 1.5 \
                   --environment-variables SPRING_PROFILES_ACTIVE=prod \
                   --registry-login-server $(acrName).azurecr.io \
                   --registry-username $(az acr credential show --name $(acrName) --query username -o tsv) \
