@@ -5,15 +5,19 @@ resources:
   - repo: self
 
 variables:
+  # CONFIGURAÇÃO DE INFRAESTRUTURA 
   azureSubscriptionConnection: 'AzureConnection'
-  resourceGroupName: 'rg-talentmind-gs'      
-  acrName: 'acrtalentmindgsvitor'              
+  resourceGroupName: 'rg-talentmind-gs'
+  acrName: 'acrtalentmindgsvitor'
   
+  # Configuração da Aplicação
   imageName: 'talentmind-java'
   containerName: 'app-talentmind-instance'
   
+  # Caminho do Projeto
   projectPath: 'challenge java/demo'
   
+  # Configuração da Imagem e Docker
   dockerRegistryServiceConnection: 'AcrConnection'
   tag: '$(Build.BuildId)'
 
