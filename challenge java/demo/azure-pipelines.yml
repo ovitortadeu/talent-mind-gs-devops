@@ -1,0 +1,105 @@
+trigger:
+  - main
+
+resources:
+  - repo: self
+
+variables:
+  # AJUSTE ESTAS VARIÁVEIS APÓS RODAR O SCRIPT DE INFRA
+  azureSubscriptionConnection: 'AzureConnection' # Nome da Service Connection no Azure DevOps
+  resourceGroupName: 'rg-talentmind-gs'
+  acrName: 'acrtalentmindgsXXXX' # Substitua pelo nome gerado no script
+  imageName: 'talentmind-java'
+  containerName: 'app-talentmind-instance'
+  
+  # Configuração da Imagem
+  dockerRegistryServiceConnection: 'AcrConnection' # Nome da conexão com o Docker Registry no ADO
+  tag: '$(Build.BuildId)'
+
+stages:
+  - stage: Build
+    displayName: Build and Test
+    jobs:
+      - job: Build
+        displayName: Build Maven & Run Tests
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          # 1. Configurar Java 21
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '21'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          # 2. Build e Testes Unitários (JUnit)
+          - task: Maven@4
+            displayName: 'Maven Build & Test'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'clean package'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.21'
+
+          # 3. Publicar Artefato (JAR) - Opcional em Container, mas boa prática
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(system.defaultworkingdirectory)'
+              Contents: '**/target/*.jar'
+              TargetFolder: '$(build.artifactstagingdirectory)'
+          
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+  - stage: DockerBuildPush
+    displayName: Build & Push Docker Image
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - job: Docker
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Docker@2
+            displayName: Build and Push to ACR
+            inputs:
+              command: buildAndPush
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(imageName)
+              dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+              tags: |
+                $(tag)
+                latest
+
+  - stage: Deploy
+    displayName: Deploy to ACI
+    dependsOn: DockerBuildPush
+    condition: succeeded()
+    jobs:
+      - job: DeployACI
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Deploy to Azure Container Instances'
+            inputs:
+              azureSubscription: $(azureSubscriptionConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Deploying to ACI..."
+                az container create \
+                  --resource-group $(resourceGroupName) \
+                  --name $(containerName) \
+                  --image $(acrName).azurecr.io/$(imageName):$(tag) \
+                  --dns-name-label $(containerName)-$RANDOM \
+                  --ports 8080 \
+                  --environment-variables SPRING_PROFILES_ACTIVE=prod \
+                  --registry-login-server $(acrName).azurecr.io \
+                  --registry-username $(az acr credential show --name $(acrName) --query username -o tsv) \
+                  --registry-password $(az acr credential show --name $(acrName) --query passwords[0].value -o tsv)
