@@ -5,16 +5,15 @@ resources:
   - repo: self
 
 variables:
-  # CONFIGURAÇÃO DE INFRAESTRUTURA 
   azureSubscriptionConnection: 'AzureConnection'
   resourceGroupName: 'rg-talentmind-gs'      
   acrName: 'acrtalentmindgsvitor'              
   
-  # Configuração da Aplicação
   imageName: 'talentmind-java'
   containerName: 'app-talentmind-instance'
   
-  # Configuração da Imagem e Docker
+  projectPath: 'challenge java/demo'
+  
   dockerRegistryServiceConnection: 'AcrConnection'
   tag: '$(Build.BuildId)'
 
@@ -36,7 +35,7 @@ stages:
           - task: Maven@4
             displayName: 'Maven Build & Test'
             inputs:
-              mavenPomFile: 'pom.xml'
+              mavenPomFile: '$(projectPath)/pom.xml'
               goals: 'clean package'
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
@@ -70,7 +69,8 @@ stages:
               command: buildAndPush
               containerRegistry: $(dockerRegistryServiceConnection)
               repository: $(imageName)
-              dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+              dockerfile: '$(Build.SourcesDirectory)/$(projectPath)/Dockerfile'
+              buildContext: '$(Build.SourcesDirectory)/$(projectPath)'
               tags: |
                 $(tag)
                 latest
