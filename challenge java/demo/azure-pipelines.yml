@@ -105,6 +105,7 @@ stages:
                   --memory 0.8 \
                   --environment-variables \
                     SPRING_PROFILES_ACTIVE=prod \
+                    JAVA_TOOL_OPTIONS="-Xms256m -Xmx400m" \
                     DB_URL="jdbc:oracle:thin:@//db-oracle-494416408.eastus.azurecontainer.io:1521/XE" \
                     DB_USERNAME="SYSTEM" \
                     DB_PASSWORD="oracle" \
