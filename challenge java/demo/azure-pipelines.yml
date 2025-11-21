@@ -101,11 +101,12 @@ stages:
                   --os-type Linux \
                   --dns-name-label $(containerName)-$RANDOM \
                   --ports 8080 \
-                  --cpu 0.5 \
-                  --memory 1.0 \
+                  --cpu 1 \
+                  --memory 1.5 \
+                  --restart-policy Always \
                   --environment-variables \
                     SPRING_PROFILES_ACTIVE=prod \
-                    JAVA_TOOL_OPTIONS="-Xms256m -Xmx512m" \
+                    JAVA_TOOL_OPTIONS="-Xms512m -Xmx1024m" \
                     DB_URL="jdbc:oracle:thin:@//db-oracle-494416408.eastus.azurecontainer.io:1521/XE" \
                     DB_USERNAME="SYSTEM" \
                     DB_PASSWORD="oracle" \
@@ -115,6 +116,7 @@ stages:
                     SPRING_RABBITMQ_PORT="5672" \
                     SPRING_RABBITMQ_USERNAME="guest" \
                     SPRING_RABBITMQ_PASSWORD="guest" \
+                    OPENAI_API_KEY=$(OPENAI_API_KEY) \
                   --registry-login-server $(acrName).azurecr.io \
                   --registry-username $(az acr credential show --name $(acrName) --query username -o tsv) \
                   --registry-password $(az acr credential show --name $(acrName) --query passwords[0].value -o tsv)
