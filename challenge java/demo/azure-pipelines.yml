@@ -101,8 +101,8 @@ stages:
                     --os-type Linux \
                     --dns-name-label $(containerName)-$RANDOM \
                     --ports 8080 \
-                    --cpu 1 \
-                    --memory 1.5 \
+                    --cpu 0.5 \
+                    --memory 0.8 \
                     --environment-variables \
                       SPRING_PROFILES_ACTIVE=prod \
                       DB_URL="jdbc:oracle:thin:@//db-oracle-1565477570.eastus.azurecontainer.io:1521/XE" \
