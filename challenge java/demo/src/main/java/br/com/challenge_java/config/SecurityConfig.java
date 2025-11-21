@@ -61,11 +61,12 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JWTAuthFilter jwtAuthFilter) throws Exception {
-    	http
+        http
         .securityMatcher("/api/**", "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/usuarios").permitAll() 
             .anyRequest().authenticated()
         )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
