@@ -1,117 +1,104 @@
-# 💻 TalentMind - O Futuro do Trabalho (Global Solution Java Advanced)
+# 💻 TalentMind - O Futuro do Trabalho (Global Solution)
 
 🌟 ## Visão Geral do Projeto
 
-O **TalentMind** é uma plataforma inovadora desenvolvida para a Global Solution 2025 (Java Advanced). O projeto endereça o tema "O Futuro do Trabalho" ao conectar vagas, competências e cursos de requalificação (reskilling). A solução é construída com Spring Boot 3 (Java 21), adotando uma arquitetura com APIs REST (HATEOAS), WebApp (Thymeleaf) e forte ênfase em arquiteturas modernas.
+O **TalentMind** é uma plataforma inovadora desenvolvida para a Global Solution 2025, abordando o tema "O Futuro do Trabalho". A solução foi projetada para conectar talentos a oportunidades de forma inteligente, alinhando vagas, competências e cursos de requalificação profissional.
 
-🎯 ## Objetivos Chave
+Este projeto destaca-se pela sua **Arquitetura Cloud Native** e pela implementação de **Práticas de DevOps** de ponta. A infraestrutura utiliza Azure Container Instances (ACI) para orquestrar a aplicação Java, um banco de dados Oracle e o message broker RabbitMQ, tudo provisionado e gerenciado na nuvem.
 
--   **IA Generativa**: Geração de planos de estudos personalizados, utilizando Spring AI e o modelo Llama 3.
--   **Mensageria Assíncrona**: Utilização de RabbitMQ para processamento em background do cálculo de compatibilidade de novas vagas.
--   **Segurança Robusta**: Implementação de Spring Security com autenticação Web (Form Login) e APIs stateless com JWT.
--   **Internacionalização**: Suporte a múltiplos idiomas (Português/Inglês).
+🎯 ## Arquitetura de DevOps e Nuvem
 
----
+A solução foi arquitetada para garantir alta disponibilidade, escalabilidade e automação, seguindo os pilares do DevOps:
 
-🛠️ ## Pré-Requisitos
-
-Para rodar o projeto localmente, é necessário ter as seguintes ferramentas instaladas:
-
--   Java Development Kit (JDK) 21
--   Apache Maven 3.9.x (para construção do projeto)
--   Docker (para inicializar os serviços de mensageria e IA)
-
-### 1. Instalação do Docker
-
-Acesse o site oficial do [Docker](https://www.docker.com/) e instale o Docker Desktop (para Windows/Mac) ou o Docker Engine (para Linux).
-
-### 2. Configuração do Banco de Dados Oracle
-
-As configurações de conexão para o banco de dados Oracle da FIAP são definidas em `src/main/resources/application.properties`. Certifique-se de atualizar com suas credenciais:
-
-```properties
-spring.datasource.url=jdbc:oracle:thin:@//oracle.fiap.com.br:1521/ORCL
-spring.datasource.username=seu_rm
-spring.datasource.password=sua_senha
-```
-
-### 3. Configuração da IA Generativa
-
-Este projeto utiliza a API do Groq para o modelo `llama-3.1-8b-instant`. Obtenha sua chave de API e insira-a no `application.properties`:
-
-```properties
-spring.ai.openai.api-key=gsk_SUA_CHAVE_AQUI
-```
+-   **App (Java 21 + Spring Boot):** Aplicação principal containerizada e executada em *Azure Container Instances (ACI)*.
+-   **Banco de Dados (Oracle XE 21c):** Hospedado em um container dedicado no Azure, garantindo persistência, isolamento e gerenciamento via *Infraestrutura como Código (IaC)*.
+-   **Mensageria (RabbitMQ):** Um container exclusivo para o RabbitMQ gerencia o processamento assíncrono de compatibilidade de vagas, desacoplando os serviços.
+-   **CI/CD (Azure DevOps):** Um pipeline totalmente automatizado que gerencia o ciclo de vida da aplicação, incluindo build, testes, criação de imagem Docker e deploy contínuo em ambiente de nuvem.
 
 ---
 
-🚀 ## Como Executar o Projeto
+🛠️ ## Tecnologias e Ferramentas
 
-### 1. Inicialização das Dependências Críticas (Docker)
-
-O RabbitMQ e o banco de dados Oracle (via Flyway) são críticos. A execução do RabbitMQ via Docker é obrigatória para o funcionamento da mensageria assíncrona.
-
-**a) Inicializar RabbitMQ (Mensageria Assíncrona):**
-
-Este comando inicializa o servidor RabbitMQ em modo daemon na porta padrão e com o painel de gerenciamento exposto:
-
-```bash
-docker run -d --hostname rabbitmq --name rabbitmq-server -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-```
-*(O Spring AMQP usará a porta `5672` e o console de administração estará em http://localhost:15672)*
-
-### 2. Compilação e Execução do Spring Boot
-
-Execute o projeto TalentMind via Maven Wrapper:
-
-```bash
-./mvnw spring-boot:run
-```
-
-**Migração de Banco de Dados**: O Flyway (dependência Maven) rodará automaticamente os scripts SQL (`V1` a `V4`)), criando todas as tabelas, triggers de auditoria, pacotes PL/SQL e dados de seed iniciais.
+| Categoria             | Tecnologia/Ferramenta                                      |
+| --------------------- | ---------------------------------------------------------- |
+| **Nuvem**             | Microsoft Azure (Resource Groups, ACR, ACI)                |
+| **CI/CD**             | Azure Pipelines (YAML)                                     |
+| **Containerização**   | Docker & Azure Container Registry (ACR)                    |
+| **Backend**           | Java 21, Spring Boot 3, Spring AI                          |
+| **Banco de Dados**    | Oracle Database 21c XE (Imagem Docker Otimizada)           |
+| **Segurança**         | Azure DevOps Secret Variables (OpenAI Keys, Senhas de DB)  |
 
 ---
 
-🔑 ## Acessos e Endpoints
+🚀 ## Pipeline de CI/CD
 
-### 1. Acesso Web (Thymeleaf MVC)
+O projeto utiliza um pipeline robusto definido no arquivo `azure-pipelines.yml`, dividido em três estágios principais:
 
-O Dashboard e a interface de administração estão disponíveis em: `http://localhost:8080/dashboard`.
+1.  **Stage: Build**
+    -   Compila o projeto Java utilizando Maven.
+    -   Executa testes unitários para garantir a qualidade do código.
 
-**Login de Administrador:**
--   **E-mail**: `admin@talentmind.com`
--   **Senha**: `password` (Senha BCrypt armazenada no script V4)
+2.  **Stage: Docker**
+    -   Constrói a imagem Docker da aplicação.
+    -   Envia a imagem para o *Azure Container Registry (ACR)*.
 
-### 2. API REST (Swagger UI)
-
-A documentação da API para testes (HATEOAS, Paginação, CRUD) está em: `http://localhost:8080/swagger-ui.html`.
-
-#### Endpoints Principais
-
-| Endpoint                               | Verbo | Descrição                                                              |
-| -------------------------------------- | ----- | ---------------------------------------------------------------------- |
-| `/api/auth/login`                      | POST  | Gera o token JWT para autenticação.                                    |
-| `/api/ia/plano-de-estudos/{vagaId}`      | GET   | Aciona a IA para gerar plano de estudos para a vaga especificada.      |
-| `/api/usuarios`                        | CRUD  | Gerenciamento de Usuários (com Paginação e HATEOAS).                   |
-| `/api/vagas`                           | CRUD  | Gerenciamento de Vagas (com Mensageria assíncrona ao criar/atualizar). |
-| `/api/competencias`                    | CRUD  | Gerenciamento de Competências.                                         |
-| `/api/cursos`                          | CRUD  | Gerenciamento de Cursos de Requalificação.                             |
-
-#### Autenticação JWT (Fluxo)
-
-1.  **Obter Token**: Faça um `POST` para `/api/auth/login` com as credenciais.
-2.  **Usar Token**: Envie o token JWT retornado no cabeçalho `Authorization` para acessar qualquer endpoint REST `api/**`:
-    ```
-    Authorization: Bearer <SEU_TOKEN>
-    ```
+3.  **Stage: Deploy**
+    -   Provisiona automaticamente a infraestrutura no *Azure Container Instances* via Azure CLI.
+    -   Injeta variáveis de ambiente e segredos (como senhas e API keys) em tempo de execução para garantir a segurança.
 
 ---
 
-📢 ## Fluxo de Mensageria Assíncrona
+🔑 ## Como Acessar a Aplicação
 
-A criação de uma nova **Vaga** (via API ou Web App) aciona o seguinte fluxo assíncrono (RabbitMQ):
+Após a execução bem-sucedida do pipeline de deploy, a aplicação estará disponível publicamente na nuvem.
 
-1.  O `VagaService` persiste a nova vaga no DB.
-2.  O `VagaService` publica o `ID_VAGA` na `DirectExchange` com a chave `rk.vaga-nova`.
-3.  O `CompatibilidadeService` atua como listener na fila `q.talentmind.vaga-nova`.
-4.  O listener realiza o cálculo de compatibilidade entre a nova vaga e todos os usuários cadastrados em background, simulando um processamento pesado.
+### 1. Obter URL Pública
+
+Execute o comando abaixo no Azure CLI para obter o endereço de acesso da aplicação:
+
+```powershell
+az container show --resource-group rg-talentmind-gs --name app-talentmind-instance --query ipAddress.fqdn --output tsv
+```
+
+### 2. Credenciais de Acesso
+
+O sistema é populado com dados iniciais (Seed Data) através do Flyway. Utilize as seguintes credenciais para acessar como administrador:
+
+-   **E-mail:** `admin_novo@teste.com`
+-   **Senha:** `password`
+
+---
+
+📄 ## Documentação da API
+
+A documentação técnica dos endpoints RESTful (Swagger/OpenAPI) está disponível publicamente e pode ser acessada no seguinte endereço:
+
+-   **Swagger UI:** `http://<SUA-URL-AZURE>:8080/swagger-ui.html`
+
+---
+
+⚙️ ## Configuração de Variáveis de Ambiente (Segurança)
+
+Por questões de segurança, chaves de API sensíveis e senhas de banco de dados não são armazenadas no código-fonte. Elas são gerenciadas como **Secret Variables** no Azure DevOps e injetadas no ambiente durante o deploy:
+
+-   `OPENAI_API_KEY`: Chave para integração com serviços de IA Generativa.
+---
+
+📢 ## Fluxo Assíncrono com RabbitMQ
+
+O sistema demonstra um fluxo de trabalho assíncrono para otimizar a experiência do usuário na criação de vagas:
+
+1.  O usuário cria uma nova vaga na plataforma.
+2.  O sistema grava os dados da vaga no banco de dados Oracle de forma síncrona.
+3.  Um evento (`vaga-nova`) é publicado na fila `q.talentmind.vaga-nova` do RabbitMQ.
+4.  Um serviço consumidor (worker) processa a mensagem em background para realizar o cálculo de compatibilidade (*match*) com os perfis de candidatos, sem impactar a performance da aplicação principal.
+
+---
+
+👥 ## Equipe
+
+| RM       | Nome                        | Turma    |
+| -------- | --------------------------- | -------- |
+| RM559105 | Vitor Tadeu Soares de Sousa | 2TDSPH   |
+| RM556536 | Giovanni de Souza Lima      | 2TDSPH   |
+| RM558710 | Diego Bassalo               | 2TDSPG   |
