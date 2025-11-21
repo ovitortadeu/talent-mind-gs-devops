@@ -75,6 +75,20 @@ A documentação técnica dos endpoints RESTful (Swagger/OpenAPI) está disponí
 
 -   **Swagger UI:** `http://<SUA-URL-AZURE>:8080/swagger-ui.html`
 
+--- 
+
+## 🔌 Exemplos de Uso da API (JSON)
+
+Abaixo estão exemplos de *payloads* para testar os endpoints principais via Swagger ou Postman.
+
+### **1. Criar Novo Usuário (POST /api/usuarios)**
+```json
+{
+  "nomeUsuario": "Candidato DevOps",
+  "email": "devops@candidato.com.br",
+  "senha": "SenhaForte@123"
+}
+```
 ---
 
 ⚙️ ## Configuração de Variáveis de Ambiente (Segurança)
