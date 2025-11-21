@@ -61,13 +61,13 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JWTAuthFilter jwtAuthFilter) throws Exception {
-        http
-            .securityMatcher("/api/**", "/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .anyRequest().authenticated()
-            )
+    	http
+        .securityMatcher("/api/**", "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+            .anyRequest().authenticated()
+        )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -82,17 +82,15 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**", "/error").permitAll()
-                // Rotas de Admin (Exemplo para os futuros CRUDS)
                 .requestMatchers("/vagas/new", "/vagas/edit/**", "/vagas/delete/**").hasRole("ADMIN")
                 .requestMatchers("/competencias/new", "/competencias/edit/**", "/competencias/delete/**").hasRole("ADMIN")
                 .requestMatchers("/cursos/new", "/cursos/edit/**", "/cursos/delete/**").hasRole("ADMIN")
-                // Qualquer outra rota web exige autenticação
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .usernameParameter("email") // Informa ao Spring Security que o campo de usuário é 'email'
-                .defaultSuccessUrl("/dashboard", true) // Redireciona para o dashboard
+                .usernameParameter("email") 
+                .defaultSuccessUrl("/dashboard", true) 
                 .permitAll()
             )
             .logout(logout -> logout
