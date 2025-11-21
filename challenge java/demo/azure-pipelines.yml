@@ -102,20 +102,15 @@ stages:
                   --dns-name-label $(containerName)-$RANDOM \
                   --ports 8080 \
                   --cpu 0.5 \
-                  --memory 0.8 \
+                  --memory 1.0 \
                   --environment-variables \
                     SPRING_PROFILES_ACTIVE=prod \
-                    JAVA_TOOL_OPTIONS="-Xms256m -Xmx400m" \
+                    JAVA_TOOL_OPTIONS="-Xms256m -Xmx512m" \
                     DB_URL="jdbc:oracle:thin:@//db-oracle-494416408.eastus.azurecontainer.io:1521/XE" \
                     DB_USERNAME="SYSTEM" \
                     DB_PASSWORD="oracle" \
-                    SPRING_DATASOURCE_HIKARI_MINIMUMIDLE=0 \
-                    SPRING_DATASOURCE_HIKARI_MAXIMUMPOOLSIZE=5 \
-                    SPRING_DATASOURCE_HIKARI_IDLETIMEOUT=30000 \
                     SPRING_DATASOURCE_HIKARI_MAXLIFETIME=120000 \
-                    SPRING_DATASOURCE_HIKARI_CONNECTIONTIMEOUT=20000 \
                     SPRING_DATASOURCE_HIKARI_KEEPALIVETIME=60000 \
-                    SPRING_DATASOURCE_HIKARI_VALIDATIONTIMEOUT=3000 \
                     SPRING_RABBITMQ_HOST="broker-rabbit-1565477570.eastus.azurecontainer.io" \
                     SPRING_RABBITMQ_PORT="5672" \
                     SPRING_RABBITMQ_USERNAME="guest" \
